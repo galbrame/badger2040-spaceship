@@ -15,8 +15,6 @@ badger2040.system_speed(badger2040.SYSTEM_FAST)
 displayWidth = badger2040.WIDTH
 displayHeight = badger2040.HEIGHT
 
-player = Player(display)
-
 
 #----------
 # Clear the screen
@@ -33,12 +31,12 @@ def clearScreen():
 def runGame():
     score = 0
     running = True
+    player = Player(display)
+    asteroids = [Asteroid(display)]
     
     clearScreen()
     display.set_update_speed(badger2040.UPDATE_TURBO)
     display.update()
-    
-    player.setPosition(displayWidth - (player.width + 5), int(displayHeight/2) - int(player.height/2))
     
     while running:
         clearScreen()
@@ -53,8 +51,28 @@ def runGame():
         elif display.pressed(badger2040.BUTTON_A):
             running = False
             
-        player.draw()
+        if random.randint(0, 100) > 90:
+            asteroids.append(Asteroid(display))
+            
+        for a in asteroids:
+            if a.onScreen():
+                a.updateMovement()
+                a.draw()
+            else:
+                score += 1
+                asteroids.remove(a)
+                if (len(asteroids) == 0):
+                    asteroids.append(Asteroid(display))
+            
+        updateScore(score)
+        player.draw() #jpeg must always be drawn last for rest to show up
         display.update()
+        
+        for a in asteroids:
+            if a.collision(player):
+                running = False
+    
+    return score
     
 
 #----------
@@ -66,10 +84,26 @@ def displayTitle():
     display.text("Spaceship!", 20, 20, scale=2)
     display.set_font("bitmap8")
     display.text("Press UP to start", 20, 60, scale=2)
-    display.text("Hold C and press A to quit", 20, 90, scale=2)
+    display.text("Press A and C to quit", 20, 90, scale=2)
     display.set_update_speed(badger2040.UPDATE_FAST)
     display.update()
     
+    
+def gameOver(score):
+    clearScreen()
+    display.set_font("bitmap14_outline")
+    display.text("Game Over!", 20, 20, scale=2)
+    display.set_font("bitmap8")
+    display.text("Score: " + str(score), 190, 25, scale=2)
+    display.text("Press UP to start over", 20, 60, scale=2)
+    display.text("Press A and C to quit", 20, 90, scale=2)
+    display.set_update_speed(badger2040.UPDATE_FAST)
+    display.update()
+    
+    
+def updateScore(score):
+    display.set_font("bitmap8")
+    display.text("Score: " + str(score), 5, 5, scale=2)
     
 
 #----------
@@ -80,15 +114,8 @@ displayTitle()
 while True:
     #play the game
     if display.pressed(badger2040.BUTTON_UP):
-        runGame() #loops until player gets hit
+        score = runGame() #loops until player gets hit
         clearScreen()
         display.update()
-        displayTitle() #show the title screen if player dies
-    
-    #quit game
-    elif display.pressed(badger2040.BUTTON_A):
-        clearScreen()
-        display.set_update_speed(badger2040.UPDATE_FAST)
-        display.update()
-        display.halt()
+        gameOver(score)
 
