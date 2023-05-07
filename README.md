@@ -1,6 +1,6 @@
 # badger2040-spaceship
 
-A very simple obstacle avoidance style game. Obviously not well-suited to the hardware, but was a fun project to build, nonetheless. This project was built on the badger operating system version 0.0.2.
+A very simple obstacle avoidance style game. Obviously not well-suited to the hardware, but was a fun project to build, nonetheless. This project was built on the badger operating system **version 0.0.2**.
 
 
 

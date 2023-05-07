@@ -1,8 +1,18 @@
+#----------
+# SPACESHIP is a terrible use of the badger medium, due to the low refresh rate
+# and slow button responses, but was fun to make (and show off) none the less.
+# - ENJOY! :)
+#
+# NOTES:
+#
+#    - written for badger OS version 0.0.2
+#    - badger2040 appears to not like floats for screen coordinates
+#    - (0,0) is the top left, (WIDTH, HEIGHT) is the bottom right of screen
+#    - jpegs must be drawn last, or else other objects appear to not show up
+#----------
+
 import badger2040
-import time
 import random
-import io
-from machine import Pin
 from space.gameEngine import *
 
 #----------
@@ -26,7 +36,9 @@ def clearScreen():
     
 
 #----------
-# Main Game Loop
+# Game loop
+#
+# Returns score (int) for printing "Game Over" screen
 #----------
 def runGame():
     score = 0
@@ -41,9 +53,11 @@ def runGame():
     while running:
         clearScreen()
         
+        # move up
         if display.pressed(badger2040.BUTTON_UP) and player.y > 0:
             player.setPosition(player.x, (player.y - 10))
         
+        # move down
         elif display.pressed(badger2040.BUTTON_DOWN) and player.y < displayHeight - player.height:
             player.setPosition(player.x, (player.y + 10))
         
@@ -51,16 +65,20 @@ def runGame():
         elif display.pressed(badger2040.BUTTON_A):
             running = False
             
+        # add asteroids approximately 10% of the time
         if random.randint(0, 100) > 90:
             asteroids.append(Asteroid(display))
-            
+        
         for a in asteroids:
+            # move and draw asteroids
             if a.onScreen():
                 a.updateMovement()
                 a.draw()
+            # if asteroid off screen, points for you!
             else:
                 score += 1
                 asteroids.remove(a)
+                # and if we happen have no asteroids left, add one
                 if (len(asteroids) == 0):
                     asteroids.append(Asteroid(display))
             
@@ -89,6 +107,9 @@ def displayTitle():
     display.update()
     
     
+#----------
+# Game Over screen
+#----------
 def gameOver(score):
     clearScreen()
     display.set_font("bitmap14_outline")
@@ -101,9 +122,14 @@ def gameOver(score):
     display.update()
     
     
+#----------
+# Add the score to the top left of screen
+#----------
 def updateScore(score):
     display.set_font("bitmap8")
     display.text("Score: " + str(score), 5, 5, scale=2)
+    # display.update() will be called when game screen ready to
+    # be re-drawn
     
 
 #----------
@@ -118,4 +144,6 @@ while True:
         clearScreen()
         display.update()
         gameOver(score)
-
+    
+    # User can press A+C to return to badger launcher, as per
+    # normal use
