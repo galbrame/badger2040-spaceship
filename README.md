@@ -2,7 +2,9 @@
 
 A very simple obstacle avoidance style game. Obviously not well-suited to the hardware, but was a fun project to build, nonetheless. This project was built on the badger operating system **version 0.0.2**.
 
-Check out a video of [Spaceship in action](https://youtu.be/qSq-_URYxpU).
+![a gif of space in action](readme_img/space.gif)
+
+Check out the complete video of Spaceship in action on [YouTube](https://youtu.be/qSq-_URYxpU).
 
 
 ## Getting Started
